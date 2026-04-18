@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: campus-club-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false # Set this manually in Render Dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 5000
+      - key: CLIENT_URL
+        fromService:
+          type: web
+          name: campus-club-frontend
+          envVarKey: RENDER_EXTERNAL_URL
+
+  - type: web
+    name: campus-club-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        sync: false # Need to manually set this in the Render dashboard to the backend URL + "/api" (e.g. https://your-backend.onrender.com/api)
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
